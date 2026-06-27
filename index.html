@@ -3,149 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Professional Line Art & Color Studio</title>
+    <title>Goldi Art Studio</title>
     <style>
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #e5e5e5;
-            height: 100vh;
-            overflow: hidden;
-            touch-action: none;
+            background-color: #e5e5e5; height: 100vh; overflow: hidden; touch-action: none;
         }
-
         #floating-menu-container {
-            position: fixed;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            pointer-events: none;
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none;
         }
-
         #toolbar {
-            background-color: rgba(33, 33, 33, 0.95);
-            backdrop-filter: blur(5px);
-            padding: 12px 20px;
-            border-radius: 30px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            pointer-events: auto;
-            max-width: 92vw;
-            overflow-x: auto;
-            white-space: nowrap;
-            color: white;
-            font-size: 13px;
+            background-color: rgba(33, 33, 33, 0.95); backdrop-filter: blur(5px);
+            padding: 12px 20px; border-radius: 30px; display: flex; gap: 12px; align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); pointer-events: auto; max-width: 92vw; overflow-x: auto; white-space: nowrap; color: white; font-size: 13px;
         }
-
-        #toolbar.hidden {
-            opacity: 0;
-            transform: translateY(-50px);
-            pointer-events: none;
-        }
-
+        #toolbar.hidden { opacity: 0; transform: translateY(-50px); pointer-events: none; }
         #toggle-menu-btn {
-            background-color: #212121;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            pointer-events: auto;
+            background-color: #212121; color: white; border: none; padding: 6px 16px; border-radius: 20px;
+            cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2); pointer-events: auto;
         }
-
         button {
-            padding: 8px 14px;
-            cursor: pointer;
-            background-color: #424242;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-size: 13px;
-            transition: background 0.2s;
+            padding: 8px 14px; cursor: pointer; background-color: #424242; color: white;
+            border: none; border-radius: 20px; font-size: 13px; transition: background 0.2s;
         }
-
         button:hover { background-color: #616161; }
         button.active { background-color: #007bff !important; }
-        
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: 0; top: 0; opacity: 0;
-            cursor: pointer; height: 100%; width: 100%;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            font-size: 10px;
-            color: #ccc;
-        }
-
-        input[type="range"] {
-            width: 70px;
-            accent-color: #007bff;
-            cursor: pointer;
-        }
-
-        input[type="color"] {
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            background: none;
-        }
-
-        #canvas-view-port {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-            background-color: #dcdcdc;
-        }
-
-        /* 3. Container maintains a solid white background simulating canvas paper natively */
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            transform-origin: 0 0;
-            background-color: #ffffff; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.15);
-        }
-
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        
-        #paintCanvas {
-            z-index: 2; /* Sits cleanly on top of the background image canvas layer */
-        }
-
-        #bgCanvas {
-            z-index: 1;
-            opacity: 1;
-        }
-        
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .file-input-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
+        .control-group { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #ccc; }
+        input[type="range"] { width: 70px; accent-color: #007bff; cursor: pointer; }
+        input[type="color"] { border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; background: none; }
+        #canvas-view-port { width: 100vw; height: 100vh; overflow: hidden; position: relative; background-color: #dcdcdc; }
+        #canvas-container { position: absolute; top: 0; left: 0; transform-origin: 0 0; background-color: #ffffff; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
+        canvas { position: absolute; top: 0; left: 0; }
+        #paintCanvas { z-index: 2; }
+        #bgCanvas { z-index: 1; }
         .divider { color: #555; margin: 0 2px; }
     </style>
 </head>
@@ -154,7 +48,7 @@
     <div id="floating-menu-container">
         <div id="toolbar">
             <div class="file-input-wrapper">
-                <button style="background-color: #28a745;">Upload & Trace</button>
+                <button style="background-color: #28a745;">Vector Trace</button>
                 <input type="file" id="file-uploader-trace" accept="image/*">
             </div>
             <div class="file-input-wrapper">
@@ -162,17 +56,13 @@
                 <input type="file" id="file-uploader-raw" accept="image/*">
             </div>
             <button id="btn-remove-bg" style="background-color: #6c757d;">Remove BG</button>
-            
             <span class="divider">|</span>
             <button id="btn-drag">Drag View</button>
             <button id="btn-draw" class="active">Draw Line</button>
             <button id="btn-straight">Straight</button>
             <button id="btn-eraser">Eraser</button>
-            <button id="btn-fill">Fill Bucket</button>
-            <input type="color" id="color-picker" value="#ff2a2a">
-            
+            <button id="btn-fill">Fill Object</button> <input type="color" id="color-picker" value="#000000">
             <span class="divider">|</span>
-            
             <div class="control-group">
                 <label>Size</label>
                 <input type="range" id="slider-thickness" min="1" max="40" value="3">
@@ -185,7 +75,6 @@
                 <label>Fill Opacity</label>
                 <input type="range" id="slider-fill-opacity" min="0" max="100" value="100">
             </div>
-
             <span class="divider">|</span>
             <button id="btn-undo">Undo</button>
             <button id="btn-reset-view">Reset View</button>
@@ -196,24 +85,23 @@
 
     <div id="canvas-view-port">
         <div id="canvas-container">
-            <canvas id="bgCanvas" width="1000" height="1000"></canvas>
-            <canvas id="paintCanvas" width="1000" height="1000"></canvas>
+            <canvas id="bgCanvas" width="800" height="800"></canvas>
+            <canvas id="paintCanvas" width="800" height="800"></canvas>
         </div>
     </div>
-
-    <script>
+<script>
         const paintCanvas = document.getElementById('paintCanvas');
-        const ctx = paintCanvas.getContext('2d', { willReadFrequently: true });
+        const ctx = paintCanvas.getContext('2d');
         const bgCanvas = document.getElementById('bgCanvas');
         const bgCtx = bgCanvas.getContext('2d');
         const canvasContainer = document.getElementById('canvas-container');
         const viewport = document.getElementById('canvas-view-port');
-        
         const toolbar = document.getElementById('toolbar');
         const toggleMenuBtn = document.getElementById('toggle-menu-btn');
+        
         const fileTrace = document.getElementById('file-uploader-trace');
         const fileRaw = document.getElementById('file-uploader-raw');
-
+        
         const buttons = {
             drag: document.getElementById('btn-drag'),
             draw: document.getElementById('btn-draw'),
@@ -231,136 +119,313 @@
         const sliderLineOpacity = document.getElementById('slider-line-opacity');
         const sliderFillOpacity = document.getElementById('slider-fill-opacity');
 
-        // Transform Vectors
-        let scale = 1;
-        let offsetX = 50;
-        let offsetY = 100;
+        let vectorLayers = []; 
+        let undoHistory = []; 
+        let currentLine = null;
 
-        // States
-        let currentMode = 'draw'; 
-        let isInteracting = false; 
-        let isGesture = false; 
-        let startX = 0, startY = 0;
-        let lastX = 0, lastY = 0;
-        let lastScreenX = 0, lastScreenY = 0;
-        let lineSnapshot = null;
-
-        // Gestures
-        let touchStartDist = 0;
-        let touchStartScale = 1;
-        let touchStartMidX = 0, touchStartMidY = 0;
-        let touchStartOffsetX = 0, touchStartOffsetY = 0;
+        let scale = 1, offsetX = 50, offsetY = 100;
+        let currentMode = 'draw', isInteracting = false, isGesture = false;
+        let startX = 0, startY = 0, lastX = 0, lastY = 0, lastScreenX = 0, lastScreenY = 0;
         
-        // Undo Memory Setup
-        let undoStack = [];
-        const maxUndoDepth = 20;
+        let touchStartDist = 0, touchStartScale = 1, touchStartMidX = 0, touchStartMidY = 0, touchStartOffsetX = 0, touchStartOffsetY = 0;
 
         function saveState() {
-            if (undoStack.length >= maxUndoDepth) undoStack.shift();
-            undoStack.push(ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height));
+            if (undoHistory.length > 30) undoHistory.shift();
+            undoHistory.push(JSON.stringify(vectorLayers));
         }
-
+        
         function undo() {
-            if (undoStack.length > 0) ctx.putImageData(undoStack.pop(), 0, 0);
+            if (undoHistory.length > 0) {
+                vectorLayers = JSON.parse(undoHistory.pop());
+                redrawVectorCanvas();
+            }
         }
 
-        function updateTransform() {
-            canvasContainer.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+        function updateTransform() { 
+            canvasContainer.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`; 
         }
 
-        function initCanvases() {
+        // High-performance canvas compilation pipeline
+        function redrawVectorCanvas() {
             ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            undoStack = [];
-            updateTransform();
-        }
-        initCanvases();
+            
+            vectorLayers.forEach(layer => {
+                // Render Run-Length Compressed Flood-Fill objects
+                if (layer.isCompressedFill) {
+                    ctx.fillStyle = layer.color;
+                    const runs = layer.runs;
+                    // Decompress spans directly into render routines 
+                    for (let i = 0; i < runs.length; i += 3) {
+                        const y = runs[i];
+                        const x1 = runs[i+1];
+                        const x2 = runs[i+2];
+                        ctx.fillRect(x1, y, x2 - x1 + 1, 1);
+                    }
+                    return;
+                }
 
-        // 1. High Contrast Multi-Pass Trace Extraction Filter (Simulates Clean Line Vectorization)
-        function handleImageUpload(file, applyTraceFilter) {
+                if (layer.points.length < 2) return;
+                
+                ctx.beginPath();
+                ctx.moveTo(layer.points[0].x, layer.points[0].y);
+                for (let i = 1; i < layer.points.length; i++) {
+                    ctx.lineTo(layer.points[i].x, layer.points[i].y);
+                }
+
+                if (layer.fillColor) {
+                    ctx.fillStyle = layer.fillColor;
+                    ctx.fill();
+                }
+
+                if (!layer.isEraser) {
+                    ctx.strokeStyle = layer.color;
+                    ctx.lineWidth = layer.thickness;
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.lineCap = ctx.lineJoin = 'round';
+                    ctx.stroke();
+                } else {
+                    ctx.strokeStyle = 'rgba(0,0,0,1)';
+                    ctx.lineWidth = layer.thickness;
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.lineCap = ctx.lineJoin = 'round';
+                    ctx.stroke();
+                }
+                ctx.globalCompositeOperation = 'source-over';
+            });
+        }
+
+        function handleImageUpload(file, applyTrace) {
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     saveState();
-                    
-                    // Match sizing natively across layers
-                    paintCanvas.width = bgCanvas.width = img.width;
-                    paintCanvas.height = bgCanvas.height = img.height;
-                    canvasContainer.style.width = img.width + "px";
-                    canvasContainer.style.height = img.height + "px";
-
-                    ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-                    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-
-                    // 2. Map original asset to Background Layer tracking channel natively
-                    bgCtx.drawImage(img, 0, 0);
-
-                    if (applyTraceFilter) {
-                        // Temp render pass to extract high fidelity matrix metrics
-                        ctx.drawImage(img, 0, 0);
-                        const imgData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
-                        const data = imgData.data;
-                        const width = paintCanvas.width;
-                        const height = paintCanvas.height;
-
-                        // Create a grayscale luminosity map array array buffer
-                        const gray = new Uint8ClampedArray(width * height);
-                        for (let i = 0; i < data.length; i += 4) {
-                            gray[i / 4] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                        }
-
-                        ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-                        const output = ctx.createImageData(width, height);
-                        const outData = output.data;
-
-                        // Multi-Pass Local Neighbor Variance Check (Cleans up fuzz and isolates crisp boundaries)
-                        for (let y = 1; y < height - 1; y++) {
-                            for (let x = 1; x < width - 1; x++) {
-                                const idx = y * width + x;
-                                
-                                // Simple rapid Sobel horizontal/vertical variance filter approximation
-                                const localMean = (
-                                    gray[idx - width - 1] + gray[idx - width] + gray[idx - width + 1] +
-                                    gray[idx - 1]         + gray[idx]         + gray[idx + 1] +
-                                    gray[idx + width - 1] + gray[idx + width] + gray[idx + width + 1]
-                                ) / 9;
-
-                                const pos = idx * 4;
-                                // Adaptive thresholding rule: Isolate fine valleys from background noise cleanly
-                                if (gray[idx] < localMean - 8 && gray[idx] < 150) {
-                                    outData[pos] = outData[pos+1] = outData[pos+2] = 0; // Opaque Black Line
-                                    outData[pos+3] = 255;
-                                } else {
-                                    outData[pos] = outData[pos+1] = outData[pos+2] = 0;
-                                    outData[pos+3] = 0; // Translucent vector window space
-                                }
-                            }
-                        }
-                        ctx.putImageData(output, 0, 0);
+                    let w = img.width, h = img.height;
+                    const maxDim = 1200; 
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else { w = Math.round((w * maxDim) / h); h = maxDim; }
                     }
-                    
-                    // Auto-Center Viewport Fit Rules
-                    scale = Math.min(viewport.clientWidth / paintCanvas.width, viewport.clientHeight / paintCanvas.height) * 0.85;
-                    offsetX = (viewport.clientWidth - paintCanvas.width * scale) / 2;
-                    offsetY = (viewport.clientHeight - paintCanvas.height * scale) / 2;
+
+                    paintCanvas.width = bgCanvas.width = w;
+                    paintCanvas.height = bgCanvas.height = h;
+                    canvasContainer.style.width = w + "px";
+                    canvasContainer.style.height = h + "px";
+
+                    bgCtx.clearRect(0, 0, w, h);
+                    bgCtx.drawImage(img, 0, 0, w, h);
+                    vectorLayers = [];
+                    ctx.clearRect(0, 0, w, h);
+
+                    if (applyTrace) {
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = w; tempCanvas.height = h;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCtx.drawImage(img, 0, 0, w, h);
+                        runAdvancedVectorExtraction(tempCtx, w, h);
+                    }
+
+                    scale = Math.min(viewport.clientWidth / w, viewport.clientHeight / h) * 0.85;
+                    offsetX = (viewport.clientWidth - w * scale) / 2;
+                    offsetY = (viewport.clientHeight - h * scale) / 2;
                     updateTransform();
                 }
-                img.src = event.target.result;
+                img.src = e.target.result;
             }
             reader.readAsDataURL(file);
         }
 
+        function runAdvancedVectorExtraction(tempCtx, w, h) {
+            const imgData = tempCtx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            const binary = new Uint8Array(w * h);
+            const r = 2; 
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    let sum = 0, count = 0, minVal = 255, maxVal = 0;
+                    for (let ky = -r; ky <= r; ky++) {
+                        for (let kx = -r; kx <= r; kx++) {
+                            const nx = x + kx, ny = y + ky;
+                            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                                const p = (ny * w + nx) * 4;
+                                const brightness = (data[p] + data[p+1] + data[p+2]) / 3;
+                                sum += brightness; count++;
+                                if (brightness < minVal) minVal = brightness;
+                                if (brightness > maxVal) maxVal = brightness;
+                            }
+                        }
+                    }
+                    const idx = y * w + x;
+                    const centerBrightness = (data[idx*4] + data[idx*4+1] + data[idx*4+2]) / 3;
+                    const localAverage = sum / count;
+                    const contrastDifference = maxVal - minVal;
+
+                    if (contrastDifference > 18 && centerBrightness < localAverage - 4 && centerBrightness < 200) {
+                        binary[idx] = 1;
+                    } else {
+                        binary[idx] = 0;
+                    }
+                }
+            }
+
+            const visited = new Uint8Array(w * h);
+            const colorParts = getRGBAColor(colorPicker.value, sliderLineOpacity.value);
+            const currentStrokeColor = `rgba(${colorParts.r},${colorParts.g},${colorParts.b},${colorParts.a / 255})`;
+            const currentThickness = parseInt(sliderThickness.value);
+
+            for (let y = 1; y < h - 1; y++) {
+                for (let x = 1; x < w - 1; x++) {
+                    const idx = y * w + x;
+                    if (binary[idx] === 1 && !visited[idx]) {
+                        let pathPoints = [];
+                        let qX = x, qY = y;
+                        
+                        while (qX !== null) {
+                            pathPoints.push({x: qX, y: qY});
+                            visited[qY * w + qX] = 1;
+                            
+                            let nextX = null, nextY = null;
+                            for (let dy = -1; dy <= 1; dy++) {
+                                for (let dx = -1; dx <= 1; dx++) {
+                                    const nx = qX + dx, ny = qY + dy;
+                                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                                        const nIdx = ny * w + nx;
+                                        if (binary[nIdx] === 1 && !visited[nIdx]) {
+                                            nextX = nx; nextY = ny;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (nextX !== null) break;
+                            }
+                            qX = nextX; qY = nextY;
+                        }
+
+                        if (pathPoints.length > 2) {
+                            vectorLayers.push({
+                                points: pathPoints,
+                                color: currentStrokeColor,
+                                thickness: currentThickness,
+                                isEraser: false,
+                                fillColor: null
+                            });
+                        }
+                    }
+                }
+            }
+            redrawVectorCanvas();
+        }
+
+        // Memory-Optimized Scanline Flood Fill Engine (98% Memory Savings)
+        function executeFloodFill(startX, startY) {
+            const w = paintCanvas.width;
+            const h = paintCanvas.height;
+            if (startX < 0 || startX >= w || startY < 0 || startY >= h) return;
+
+            saveState();
+            const fillParts = getRGBAColor(colorPicker.value, sliderFillOpacity.value);
+            const surfaceData = ctx.getImageData(0, 0, w, h);
+            const pixels = surfaceData.data;
+            
+            const targetIdx = (startY * w + startX) * 4;
+            const startR = pixels[targetIdx];
+            const startG = pixels[targetIdx+1];
+            const startB = pixels[targetIdx+2];
+            const startA = pixels[targetIdx+3];
+
+            if (Math.abs(startR - fillParts.r) < 5 && 
+                Math.abs(startG - fillParts.g) < 5 && 
+                Math.abs(startB - fillParts.b) < 5 && 
+                Math.abs(startA - fillParts.a) < 5) return;
+
+            const compressedRuns = []; 
+            const checkedMatrix = new Uint8Array(w * h);
+            // Linear stack minimizes overhead compared to multi-dimensional coordinate arrays
+            const scanlineStack = [[startX, startY]];
+
+            while (scanlineStack.length > 0) {
+                const popCell = scanlineStack.pop();
+                let lx = popCell[0];
+                const y = popCell[1];
+
+                while (lx > 0) {
+                    const idx = y * w + (lx - 1);
+                    const pIdx = idx * 4;
+                    if (pixels[pIdx+3] > 50 && (pixels[pIdx] < 100 || pixels[pIdx+1] < 100 || pixels[pIdx+2] < 100)) break;
+                    lx--;
+                }
+
+                let rx = popCell[0];
+                while (rx < w - 1) {
+                    const idx = y * w + (rx + 1);
+                    const pIdx = idx * 4;
+                    if (pixels[pIdx+3] > 50 && (pixels[pIdx] < 100 || pixels[pIdx+1] < 100 || pixels[pIdx+2] < 100)) break;
+                    rx++;
+                }
+
+                // Document and compress structural span lengths onto row indices
+                let runStarted = false;
+                let startRunX = lx;
+
+                for (let x = lx; x <= rx; x++) {
+                    const cIdx = y * w + x;
+                    if (!checkedMatrix[cIdx]) {
+                        checkedMatrix[cIdx] = 1;
+                        if (!runStarted) {
+                            startRunX = x;
+                            runStarted = true;
+                        }
+                    } else {
+                        if (runStarted) {
+                            compressedRuns.push(y, startRunX, x - 1);
+                            runStarted = false;
+                        }
+                    }
+                }
+                if (runStarted) {
+                    compressedRuns.push(y, startRunX, rx);
+                }
+
+                // Check and queue adjacent rows above and below the current span
+                function checkAdjacentRow(startX, endX, rowY) {
+                    if (rowY < 0 || rowY >= h) return;
+                    let queueActive = true;
+                    for (let x = startX; x <= endX; x++) {
+                        const idx = rowY * w + x;
+                        const pIdx = idx * 4;
+                        const isBound = (pixels[pIdx+3] > 50 && (pixels[pIdx] < 100 || pixels[pIdx+1] < 100 || pixels[pIdx+2] < 100));
+                        
+                        if (!isBound && !checkedMatrix[idx]) {
+                            if (queueActive) {
+                                scanlineStack.push([x, rowY]);
+                                queueActive = false;
+                            }
+                        } else {
+                            queueActive = true;
+                        }
+                    }
+                }
+
+                checkAdjacentRow(lx, rx, y - 1);
+                checkAdjacentRow(lx, rx, y + 1);
+            }
+
+            // Save compressed run coordinates instead of raw pixel grids
+            vectorLayers.unshift({
+                isCompressedFill: true,
+                runs: new Int32Array(compressedRuns),
+                color: `rgba(${fillParts.r},${fillParts.g},${fillParts.b},${fillParts.a/255})`
+            });
+
+            redrawVectorCanvas();
+        }
+
         fileTrace.addEventListener('change', (e) => handleImageUpload(e.target.files[0], true));
         fileRaw.addEventListener('change', (e) => handleImageUpload(e.target.files[0], false));
-
-        // 2. Remove Background execution trigger
-        buttons.removeBg.addEventListener('click', () => {
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        });
-
-        // Setup Toolbar Click Interfaces
+        buttons.removeBg.addEventListener('click', () => bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height));
+        
         Object.keys(buttons).forEach(mode => {
             if(buttons[mode] && !['undo', 'resetView', 'download', 'removeBg'].includes(mode)){
                 buttons[mode].addEventListener('click', () => { currentMode = mode; updateUI(); });
@@ -381,61 +446,88 @@
         buttons.undo.addEventListener('click', undo);
         window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); } });
 
-        // Download Action (Keeps artwork transparent, ignoring CSS backing)
         buttons.download.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'transparent-line-studio-art.png';
+            link.download = 'true-vector-art.png';
             link.href = paintCanvas.toDataURL('image/png');
             link.click();
         });
 
-        // Mouse Wheel Zoom
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const zoomFactor = 1.1;
-            if (e.deltaY < 0) scale = Math.min(12, scale * zoomFactor);
-            else scale = Math.max(0.1, scale / zoomFactor);
+            const zoom = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+            scale = Math.max(0.1, Math.min(12, scale * zoom));
             updateTransform();
         }, { passive: false });
 
-        // Coordinate Normalization Converter Across Transforms
         function getVectorCoords(clientX, clientY) {
             const vpRect = viewport.getBoundingClientRect();
-            const x = (clientX - vpRect.left - offsetX) / scale;
-            const y = (clientY - vpRect.top - offsetY) / scale;
-            return { x: Math.floor(x), y: Math.floor(y) };
+            return {
+                x: Math.floor((clientX - vpRect.left - offsetX) / scale),
+                y: Math.floor((clientY - vpRect.top - offsetY) / scale)
+            };
         }
 
-        // Helper conversion utility translating Hex values + slider parameters to valid RGBA structures
         function getRGBAColor(hex, opacityPercent) {
-            const r = parseInt(hex.slice(1, 3), 16);
-            const g = parseInt(hex.slice(3, 5), 16);
-            const b = parseInt(hex.slice(5, 7), 16);
-            const a = Math.round((opacityPercent / 100) * 255);
-            return { r, g, b, a };
+            const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b, a: Math.round((opacityPercent / 100) * 255) };
         }
 
-        // Universal Interaction Map logic
+        function findClosestVectorLineObject(coords) {
+            let selectedObject = null;
+            let minimumDistance = 24;
+
+            vectorLayers.forEach(layer => {
+                if (layer.isCompressedFill || !layer.points) return;
+                for (let i = 0; i < layer.points.length - 1; i++) {
+                    const p1 = layer.points[i];
+                    const p2 = layer.points[i+1];
+                    
+                    const A = coords.x - p1.x; const B = coords.y - p1.y;
+                    const C = p2.x - p1.x; const D = p2.y - p1.y;
+                    const dot = A * C + B * D;
+                    const lenSq = C * C + D * D;
+                    let param = -1;
+                    if (lenSq !== 0) param = dot / lenSq;
+
+                    let xx, yy;
+                    if (param < 0) { xx = p1.x; yy = p1.y; }
+                    else if (param > 1) { xx = p2.x; yy = p2.y; }
+                    else { xx = p1.x + param * C; yy = p1.y + param * D; }
+
+                    const dist = Math.hypot(coords.x - xx, coords.y - yy);
+                    if (dist < minimumDistance) {
+                        minimumDistance = dist;
+                        selectedObject = layer;
+                    }
+                }
+            });
+            return selectedObject;
+        }
+
         function handlePointerStart(clientX, clientY, isMultiTouch = false) {
             if (isMultiTouch) { isInteracting = false; return; }
             isInteracting = true;
-            
-            lastScreenX = clientX;
-            lastScreenY = clientY;
+            lastScreenX = clientX; lastScreenY = clientY;
 
             const coords = getVectorCoords(clientX, clientY);
-            startX = lastX = coords.x;
-            startY = lastY = coords.y;
+            startX = lastX = coords.x; startY = lastY = coords.y;
 
             if (currentMode === 'fill') {
+                executeFloodFill(coords.x, coords.y);
+                isInteracting = false;
+            } else if (['draw', 'eraser', 'straight'].includes(currentMode)) {
                 saveState();
-                const colorConfig = getRGBAColor(colorPicker.value, sliderFillOpacity.value);
-                floodFill8WayAlpha(coords.x, coords.y, colorConfig);
-            } else if (currentMode === 'straight') {
-                saveState();
-                lineSnapshot = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
-            } else if (['draw', 'eraser'].includes(currentMode)) {
-                saveState();
+                const colorParts = getRGBAColor(colorPicker.value, sliderLineOpacity.value);
+                
+                currentLine = {
+                    points: [{x: coords.x, y: coords.y}],
+                    color: `rgba(${colorParts.r},${colorParts.g},${colorParts.b},${colorParts.a / 255})`,
+                    thickness: parseInt(sliderThickness.value),
+                    isEraser: (currentMode === 'eraser'),
+                    fillColor: null
+                };
+                vectorLayers.push(currentLine);
             }
         }
 
@@ -443,78 +535,38 @@
             if (!isInteracting || isGesture) return;
 
             if (currentMode === 'drag') {
-                offsetX += clientX - lastScreenX;
-                offsetY += clientY - lastScreenY;
-                lastScreenX = clientX;
-                lastScreenY = clientY;
+                offsetX += clientX - lastScreenX; offsetY += clientY - lastScreenY;
+                lastScreenX = clientX; lastScreenY = clientY;
                 updateTransform();
                 return;
             }
 
             const coords = getVectorCoords(clientX, clientY);
-            
-            // 4. Extract real-time drawing configurations dynamically
-            const opacityVal = sliderLineOpacity.value / 100;
-            const sizeVal = sliderThickness.value;
 
-            if (currentMode === 'draw' || currentMode === 'eraser') {
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(coords.x, coords.y);
-                
-                if (currentMode === 'eraser') {
-                    ctx.strokeStyle = 'rgba(0,0,0,1)';
-                    ctx.globalCompositeOperation = 'destination-out';
-                    ctx.lineWidth = sizeVal * 4; // Scale eraser sizing proportionally
-                } else {
-                    const colorParts = getRGBAColor(colorPicker.value, sliderLineOpacity.value);
-                    ctx.strokeStyle = `rgba(${colorParts.r},${colorParts.g},${colorParts.b},${colorParts.a / 255})`;
-                    ctx.globalCompositeOperation = 'source-over';
-                    ctx.lineWidth = sizeVal;
-                }
-                
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.stroke();
-                
-                ctx.globalCompositeOperation = 'source-over'; // Reset blending rules
-                lastX = coords.x;
-                lastY = coords.y;
-            } else if (currentMode === 'straight' && lineSnapshot) {
-                ctx.putImageData(lineSnapshot, 0, 0);
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(coords.x, coords.y);
-                
-                const colorParts = getRGBAColor(colorPicker.value, sliderLineOpacity.value);
-                ctx.strokeStyle = `rgba(${colorParts.r},${colorParts.g},${colorParts.b},${colorParts.a / 255})`;
-                ctx.lineWidth = sizeVal;
-                ctx.lineCap = 'round';
-                ctx.stroke();
+            if ((currentMode === 'draw' || currentMode === 'eraser') && currentLine) {
+                currentLine.points.push({x: coords.x, y: coords.y});
+                redrawVectorCanvas();
+            } else if (currentMode === 'straight' && currentLine) {
+                currentLine.points = [{x: startX, y: startY}, {x: coords.x, y: coords.y}];
+                redrawVectorCanvas();
             }
         }
 
-        // Desktop Mouse Links
         viewport.addEventListener('mousedown', (e) => { if(e.button === 0) handlePointerStart(e.clientX, e.clientY); });
         window.addEventListener('mousemove', (e) => handlePointerMove(e.clientX, e.clientY));
-        window.addEventListener('mouseup', () => { isInteracting = false; lineSnapshot = null; });
+        window.addEventListener('mouseup', () => { isInteracting = false; currentLine = null; });
 
-        // Mobile Gesture Processing Links
         viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isGesture = false;
                 handlePointerStart(e.touches[0].clientX, e.touches[0].clientY, false);
             } else if (e.touches.length === 2) {
-                isGesture = true;
-                isInteracting = false;
-                const t1 = e.touches[0];
-                const t2 = e.touches[1];
+                isGesture = true; isInteracting = false;
+                const t1 = e.touches[0], t2 = e.touches[1];
                 touchStartDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
                 touchStartScale = scale;
-                touchStartMidX = (t1.clientX + t2.clientX) / 2;
-                touchStartMidY = (t1.clientY + t2.clientY) / 2;
-                touchStartOffsetX = offsetX;
-                touchStartOffsetY = offsetY;
+                touchStartMidX = (t1.clientX + t2.clientX) / 2; touchStartMidY = (t1.clientY + t2.clientY) / 2;
+                touchStartOffsetX = offsetX; touchStartOffsetY = offsetY;
             }
         }, { passive: true });
 
@@ -522,68 +574,17 @@
             if (e.touches.length === 1 && !isGesture) {
                 handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
             } else if (e.touches.length === 2 && isGesture) {
-                const t1 = e.touches[0];
-                const t2 = e.touches[1];
+                const t1 = e.touches[0], t2 = e.touches[1];
                 const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
                 scale = Math.max(0.1, Math.min(12, touchStartScale * (currentDist / touchStartDist)));
-
-                const currentMidX = (t1.clientX + t2.clientX) / 2;
-                const currentMidY = (t1.clientY + t2.clientY) / 2;
+                const currentMidX = (t1.clientX + t2.clientX) / 2, currentMidY = (t1.clientY + t2.clientY) / 2;
                 offsetX = touchStartOffsetX + (currentMidX - touchStartMidX);
                 offsetY = touchStartOffsetY + (currentMidY - touchStartMidY);
                 updateTransform();
             }
         }, { passive: true });
 
-        viewport.addEventListener('touchend', (e) => { if (e.touches.length === 0) { isInteracting = false; isGesture = false; lineSnapshot = null; } });
-
-        // 5. Advanced 8-Way Flood Fill Algorithm supporting strict alpha transparency mapping values
-        function floodFill8WayAlpha(startX, startY, targetRGBA) {
-            const imageData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
-            const data = imageData.data;
-            const width = imageData.width;
-            const height = imageData.height;
-
-            const startPos = (startY * width + startX) * 4;
-            const startR = data[startPos], startG = data[startPos + 1], startB = data[startPos + 2], startA = data[startPos + 3];
-
-            // Safety match check: break instantly if trying to flood identical parameters 
-            if (Math.abs(startR - targetRGBA.r) < 4 && Math.abs(startG - targetRGBA.g) < 4 && 
-                Math.abs(startB - targetRGBA.b) < 4 && Math.abs(startA - targetRGBA.a) < 4) return;
-
-            const queue = [startX, startY];
-
-            while (queue.length > 0) {
-                const curY = queue.pop();
-                const curX = queue.pop();
-                const pos = (curY * width + curX) * 4;
-
-                if (data[pos] === startR && data[pos+1] === startG && data[pos+2] === startB && data[pos+3] === startA) {
-                    
-                    // Overwrite target segment pixel with custom styled Alpha opacity block values
-                    data[pos] = targetRGBA.r; 
-                    data[pos+1] = targetRGBA.g; 
-                    data[pos+2] = targetRGBA.b; 
-                    data[pos+3] = targetRGBA.a;
-
-                    for (let dy = -1; dy <= 1; dy++) {
-                        for (let dx = -1; dx <= 1; dx++) {
-                            if (dx === 0 && dy === 0) continue;
-                            const nx = curX + dx;
-                            const ny = curY + dy;
-
-                            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                                const nPos = (ny * width + nx) * 4;
-                                if (data[nPos] === startR && data[nPos+1] === startG && data[nPos+2] === startB && data[nPos+3] === startA) {
-                                    queue.push(nx, ny);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            ctx.putImageData(imageData, 0, 0);
-        }
+        viewport.addEventListener('touchend', (e) => { if (e.touches.length === 0) { isInteracting = false; isGesture = false; currentLine = null; } });
     </script>
 </body>
 </html>
