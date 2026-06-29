@@ -18,8 +18,29 @@
             background-color: rgba(33, 33, 33, 0.95); backdrop-filter: blur(5px);
             padding: 12px 20px; border-radius: 30px; display: flex; gap: 12px; align-items: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3); pointer-events: auto; max-width: 92vw; overflow-x: auto; white-space: nowrap; color: white; font-size: 13px;
+            transition: opacity 0.2s, transform 0.2s;
         }
         #toolbar.hidden { opacity: 0; transform: translateY(-50px); pointer-events: none; }
+        
+        /* Sidebar Control Panel */
+        #sidebar {
+            position: fixed; top: 90px; left: 15px; z-index: 9999;
+            background-color: rgba(33, 33, 33, 0.95); backdrop-filter: blur(5px);
+            padding: 16px; border-radius: 20px; display: flex; flex-direction: column; gap: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); color: white; font-size: 12px; pointer-events: auto;
+            width: 120px; transition: opacity 0.2s, transform 0.2s;
+        }
+        #sidebar.hidden { opacity: 0; transform: translateX(-50px); pointer-events: none; }
+        
+        .sidebar-group { display: flex; flex-direction: column; gap: 5px; }
+        .sidebar-group label { font-size: 10px; color: #aaa; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        select { 
+            background: #424242; color: white; border: none; padding: 8px; 
+            border-radius: 12px; font-size: 12px; cursor: pointer; width: 100%;
+        }
+        select:focus { outline: none; }
+
         #toggle-menu-btn {
             background-color: #212121; color: white; border: none; padding: 6px 16px; border-radius: 20px;
             cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2); pointer-events: auto;
@@ -27,14 +48,18 @@
         button {
             padding: 8px 14px; cursor: pointer; background-color: #424242; color: white;
             border: none; border-radius: 20px; font-size: 13px; transition: background 0.2s;
+            width: 100%; text-align: center;
         }
+        #toolbar button { width: auto; }
         button:hover { background-color: #616161; }
         button.active { background-color: #007bff !important; }
+        
         .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
         .file-input-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
         .control-group { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #ccc; }
         input[type="range"] { width: 70px; accent-color: #007bff; cursor: pointer; }
         input[type="color"] { border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; background: none; }
+        
         #canvas-view-port { width: 100vw; height: 100vh; overflow: hidden; position: relative; background-color: #dcdcdc; }
         #canvas-container { position: absolute; top: 0; left: 0; transform-origin: 0 0; background-color: #ffffff; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
         canvas { position: absolute; top: 0; left: 0; }
@@ -83,12 +108,36 @@
         <button id="toggle-menu-btn">Hide/Show Menu</button>
     </div>
 
+    <div id="sidebar">
+        <div class="sidebar-group">
+            <label>Brush Engine</label>
+            <select id="brush-type">
+                <option value="solid">Solid Pen</option>
+                <option value="marker">Marker Felt</option>
+                <option value="airbrush">Airbrush Glow</option>
+            </select>
+        </div>
+        <div class="sidebar-group">
+            <label>Stabilizer</label>
+            <input type="range" id="slider-stabilizer" min="0" max="20" value="8" style="width: 100%;">
+        </div>
+        <div class="sidebar-group">
+            <label>Shape Tools</label>
+            <button id="btn-rect">Rectangle</button>
+        </div>
+        <div class="sidebar-group">
+            <label>Auto Effects</label>
+            <button id="btn-shadow" style="background-color: #555;">Drop Shadow</button>
+        </div>
+    </div>
+
     <div id="canvas-view-port">
         <div id="canvas-container">
             <canvas id="bgCanvas" width="800" height="800"></canvas>
             <canvas id="paintCanvas" width="800" height="800"></canvas>
         </div>
     </div>
+
 <script>
         const paintCanvas = document.getElementById('paintCanvas');
         const ctx = paintCanvas.getContext('2d');
@@ -97,15 +146,20 @@
         const canvasContainer = document.getElementById('canvas-container');
         const viewport = document.getElementById('canvas-view-port');
         const toolbar = document.getElementById('toolbar');
+        const sidebar = document.getElementById('sidebar');
         const toggleMenuBtn = document.getElementById('toggle-menu-btn');
         
         const fileTrace = document.getElementById('file-uploader-trace');
         const fileRaw = document.getElementById('file-uploader-raw');
+        const brushTypeSelect = document.getElementById('brush-type');
+        const sliderStabilizer = document.getElementById('slider-stabilizer');
+        const btnShadow = document.getElementById('btn-shadow');
         
         const buttons = {
             drag: document.getElementById('btn-drag'),
             draw: document.getElementById('btn-draw'),
             straight: document.getElementById('btn-straight'),
+            rect: document.getElementById('btn-rect'),
             eraser: document.getElementById('btn-eraser'),
             fill: document.getElementById('btn-fill'),
             removeBg: document.getElementById('btn-remove-bg'),
@@ -126,6 +180,8 @@
         let scale = 1, offsetX = 50, offsetY = 100;
         let currentMode = 'draw', isInteracting = false, isGesture = false;
         let startX = 0, startY = 0, lastX = 0, lastY = 0, lastScreenX = 0, lastScreenY = 0;
+        let stableX = 0, stableY = 0; // Coordinate system variables for tracking stabilizer
+        let isShadowActive = false;
         
         let touchStartDist = 0, touchStartScale = 1, touchStartMidX = 0, touchStartMidY = 0, touchStartOffsetX = 0, touchStartOffsetY = 0;
 
@@ -145,16 +201,13 @@
             canvasContainer.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`; 
         }
 
-        // High-performance canvas compilation pipeline
         function redrawVectorCanvas() {
             ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
             
             vectorLayers.forEach(layer => {
-                // Render Run-Length Compressed Flood-Fill objects
                 if (layer.isCompressedFill) {
                     ctx.fillStyle = layer.color;
                     const runs = layer.runs;
-                    // Decompress spans directly into render routines 
                     for (let i = 0; i < runs.length; i += 3) {
                         const y = runs[i];
                         const x1 = runs[i+1];
@@ -164,12 +217,47 @@
                     return;
                 }
 
-                if (layer.points.length < 2) return;
+                if (layer.points.length < 1) return;
                 
+                // Reset configurations securely on each layer pass
+                ctx.globalAlpha = 1.0;
+                ctx.lineCap = ctx.lineJoin = 'round';
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+
+                // Protect Erasers from picking up corruption artifacts from context shadows
+                if (!layer.isEraser) {
+                    if (layer.hasShadow) {
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                        ctx.shadowBlur = 10;
+                        ctx.shadowOffsetX = 5;
+                        ctx.shadowOffsetY = 5;
+                    }
+                    
+                    if (layer.brushType === 'marker') {
+                        ctx.lineCap = 'square';
+                        ctx.lineJoin = 'miter';
+                        ctx.globalAlpha = 0.45; 
+                    } else if (layer.brushType === 'airbrush') {
+                        ctx.shadowBlur = layer.thickness * 1.5;
+                        ctx.shadowColor = layer.color;
+                    }
+                }
+
                 ctx.beginPath();
-                ctx.moveTo(layer.points[0].x, layer.points[0].y);
-                for (let i = 1; i < layer.points.length; i++) {
-                    ctx.lineTo(layer.points[i].x, layer.points[i].y);
+                if (layer.isShape === 'rectangle') {
+                    if (layer.points.length >= 2) {
+                        const p1 = layer.points[0];
+                        const p2 = layer.points[1];
+                        ctx.rect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+                    }
+                } else {
+                    ctx.moveTo(layer.points[0].x, layer.points[0].y);
+                    for (let i = 1; i < layer.points.length; i++) {
+                        ctx.lineTo(layer.points[i].x, layer.points[i].y);
+                    }
                 }
 
                 if (layer.fillColor) {
@@ -181,17 +269,20 @@
                     ctx.strokeStyle = layer.color;
                     ctx.lineWidth = layer.thickness;
                     ctx.globalCompositeOperation = 'source-over';
-                    ctx.lineCap = ctx.lineJoin = 'round';
                     ctx.stroke();
                 } else {
                     ctx.strokeStyle = 'rgba(0,0,0,1)';
                     ctx.lineWidth = layer.thickness;
                     ctx.globalCompositeOperation = 'destination-out';
-                    ctx.lineCap = ctx.lineJoin = 'round';
                     ctx.stroke();
                 }
-                ctx.globalCompositeOperation = 'source-over';
             });
+            
+            // Clean global pipeline attributes completely
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1.0;
         }
 
         function handleImageUpload(file, applyTrace) {
@@ -309,6 +400,9 @@
                                 color: currentStrokeColor,
                                 thickness: currentThickness,
                                 isEraser: false,
+                                isShape: null,
+                                brushType: 'solid',
+                                hasShadow: false,
                                 fillColor: null
                             });
                         }
@@ -318,7 +412,6 @@
             redrawVectorCanvas();
         }
 
-        // Memory-Optimized Scanline Flood Fill Engine (98% Memory Savings)
         function executeFloodFill(startX, startY) {
             const w = paintCanvas.width;
             const h = paintCanvas.height;
@@ -342,7 +435,6 @@
 
             const compressedRuns = []; 
             const checkedMatrix = new Uint8Array(w * h);
-            // Linear stack minimizes overhead compared to multi-dimensional coordinate arrays
             const scanlineStack = [[startX, startY]];
 
             while (scanlineStack.length > 0) {
@@ -365,7 +457,6 @@
                     rx++;
                 }
 
-                // Document and compress structural span lengths onto row indices
                 let runStarted = false;
                 let startRunX = lx;
 
@@ -388,7 +479,6 @@
                     compressedRuns.push(y, startRunX, rx);
                 }
 
-                // Check and queue adjacent rows above and below the current span
                 function checkAdjacentRow(startX, endX, rowY) {
                     if (rowY < 0 || rowY >= h) return;
                     let queueActive = true;
@@ -412,7 +502,6 @@
                 checkAdjacentRow(lx, rx, y + 1);
             }
 
-            // Save compressed run coordinates instead of raw pixel grids
             vectorLayers.unshift({
                 isCompressedFill: true,
                 runs: new Int32Array(compressedRuns),
@@ -426,6 +515,12 @@
         fileRaw.addEventListener('change', (e) => handleImageUpload(e.target.files[0], false));
         buttons.removeBg.addEventListener('click', () => bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height));
         
+        btnShadow.addEventListener('click', () => {
+            isShadowActive = !isShadowActive;
+            btnShadow.classList.toggle('active', isShadowActive);
+            btnShadow.style.backgroundColor = isShadowActive ? '#007bff' : '#555';
+        });
+
         Object.keys(buttons).forEach(mode => {
             if(buttons[mode] && !['undo', 'resetView', 'download', 'removeBg'].includes(mode)){
                 buttons[mode].addEventListener('click', () => { currentMode = mode; updateUI(); });
@@ -441,14 +536,18 @@
             viewport.style.cursor = (currentMode === 'drag') ? 'grab' : 'crosshair';
         }
 
-        toggleMenuBtn.addEventListener('click', () => toolbar.classList.toggle('hidden'));
+        toggleMenuBtn.addEventListener('click', () => {
+            toolbar.classList.toggle('hidden');
+            sidebar.classList.toggle('hidden');
+        });
+
         buttons.resetView.addEventListener('click', () => { scale = 1; offsetX = 50; offsetY = 100; updateTransform(); });
         buttons.undo.addEventListener('click', undo);
         window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); } });
 
         buttons.download.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'true-vector-art.png';
+            link.download = 'clean-vector-art.png';
             link.href = paintCanvas.toDataURL('image/png');
             link.click();
         });
@@ -473,50 +572,22 @@
             return { r, g, b, a: Math.round((opacityPercent / 100) * 255) };
         }
 
-        function findClosestVectorLineObject(coords) {
-            let selectedObject = null;
-            let minimumDistance = 24;
-
-            vectorLayers.forEach(layer => {
-                if (layer.isCompressedFill || !layer.points) return;
-                for (let i = 0; i < layer.points.length - 1; i++) {
-                    const p1 = layer.points[i];
-                    const p2 = layer.points[i+1];
-                    
-                    const A = coords.x - p1.x; const B = coords.y - p1.y;
-                    const C = p2.x - p1.x; const D = p2.y - p1.y;
-                    const dot = A * C + B * D;
-                    const lenSq = C * C + D * D;
-                    let param = -1;
-                    if (lenSq !== 0) param = dot / lenSq;
-
-                    let xx, yy;
-                    if (param < 0) { xx = p1.x; yy = p1.y; }
-                    else if (param > 1) { xx = p2.x; yy = p2.y; }
-                    else { xx = p1.x + param * C; yy = p1.y + param * D; }
-
-                    const dist = Math.hypot(coords.x - xx, coords.y - yy);
-                    if (dist < minimumDistance) {
-                        minimumDistance = dist;
-                        selectedObject = layer;
-                    }
-                }
-            });
-            return selectedObject;
-        }
-
         function handlePointerStart(clientX, clientY, isMultiTouch = false) {
             if (isMultiTouch) { isInteracting = false; return; }
             isInteracting = true;
             lastScreenX = clientX; lastScreenY = clientY;
 
             const coords = getVectorCoords(clientX, clientY);
+            
+            // Anchor real-time stabilizer values to origin coordinate
+            stableX = coords.x;
+            stableY = coords.y;
             startX = lastX = coords.x; startY = lastY = coords.y;
 
             if (currentMode === 'fill') {
                 executeFloodFill(coords.x, coords.y);
                 isInteracting = false;
-            } else if (['draw', 'eraser', 'straight'].includes(currentMode)) {
+            } else if (['draw', 'eraser', 'straight', 'rect'].includes(currentMode)) {
                 saveState();
                 const colorParts = getRGBAColor(colorPicker.value, sliderLineOpacity.value);
                 
@@ -525,6 +596,9 @@
                     color: `rgba(${colorParts.r},${colorParts.g},${colorParts.b},${colorParts.a / 255})`,
                     thickness: parseInt(sliderThickness.value),
                     isEraser: (currentMode === 'eraser'),
+                    isShape: (currentMode === 'rect') ? 'rectangle' : null,
+                    brushType: brushTypeSelect.value,
+                    hasShadow: isShadowActive,
                     fillColor: null
                 };
                 vectorLayers.push(currentLine);
@@ -542,12 +616,27 @@
             }
 
             const coords = getVectorCoords(clientX, clientY);
+            const stabilizerVal = parseInt(sliderStabilizer.value);
+            
+            // Exponential Smoothing Weight Formula
+            const weight = 1 / (stabilizerVal + 1);
+            stableX = stableX + (coords.x - stableX) * weight;
+            stableY = stableY + (coords.y - stableY) * weight;
+            
+            const finalX = Math.round(stableX);
+            const finalY = Math.round(stableY);
 
             if ((currentMode === 'draw' || currentMode === 'eraser') && currentLine) {
-                currentLine.points.push({x: coords.x, y: coords.y});
-                redrawVectorCanvas();
-            } else if (currentMode === 'straight' && currentLine) {
-                currentLine.points = [{x: startX, y: startY}, {x: coords.x, y: coords.y}];
+                const lastPt = currentLine.points[currentLine.points.length - 1];
+                const dist = Math.hypot(finalX - lastPt.x, finalY - lastPt.y);
+                
+                // Keep paths clean: only commit point arrays if mouse travels past distance threshold
+                if (dist >= 2) {
+                    currentLine.points.push({x: finalX, y: finalY});
+                    redrawVectorCanvas();
+                }
+            } else if ((currentMode === 'straight' || currentMode === 'rect') && currentLine) {
+                currentLine.points = [{x: startX, y: startY}, {x: Math.round(coords.x), y: Math.round(coords.y)}];
                 redrawVectorCanvas();
             }
         }
@@ -585,6 +674,6 @@
         }, { passive: true });
 
         viewport.addEventListener('touchend', (e) => { if (e.touches.length === 0) { isInteracting = false; isGesture = false; currentLine = null; } });
-    </script>
+</script>
 </body>
 </html>
